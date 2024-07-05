@@ -1,0 +1,231 @@
+From f2b68e29c16a0f8d1e19b6dc5b422dafcfa7ed2f Mon Sep 17 00:00:00 2001
+From: Derek Araki-Kurdyla <djak001@bucknell.edu>
+Date: Fri, 5 Jul 2024 14:47:28 -0400
+Subject: [PATCH 1/3] setting up environment
+
+---
+ .vscode/settings.json |  2 ++
+ Pipfile               | 12 ++++++++++++
+ Pipfile.lock          | 38 ++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 52 insertions(+)
+ create mode 100644 .vscode/settings.json
+ create mode 100644 Pipfile
+ create mode 100644 Pipfile.lock
+
+diff --git a/.vscode/settings.json b/.vscode/settings.json
+new file mode 100644
+index 0000000..7a73a41
+--- /dev/null
++++ b/.vscode/settings.json
+@@ -0,0 +1,2 @@
++{
++}
+\ No newline at end of file
+diff --git a/Pipfile b/Pipfile
+new file mode 100644
+index 0000000..e21bf6d
+--- /dev/null
++++ b/Pipfile
+@@ -0,0 +1,12 @@
++[[source]]
++url = "https://pypi.org/simple"
++verify_ssl = true
++name = "pypi"
++
++[packages]
++python-dateutil = "==2.8.2"
++
++[dev-packages]
++
++[requires]
++python_version = "3.11"
+diff --git a/Pipfile.lock b/Pipfile.lock
+new file mode 100644
+index 0000000..9b79402
+--- /dev/null
++++ b/Pipfile.lock
+@@ -0,0 +1,38 @@
++{
++    "_meta": {
++        "hash": {
++            "sha256": "44402f48232b6f3d52f648e4a9fff5900e8909fb467a5afe07b852258427e1f9"
++        },
++        "pipfile-spec": 6,
++        "requires": {
++            "python_version": "3.11"
++        },
++        "sources": [
++            {
++                "name": "pypi",
++                "url": "https://pypi.org/simple",
++                "verify_ssl": true
++            }
++        ]
++    },
++    "default": {
++        "python-dateutil": {
++            "hashes": [
++                "sha256:0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86",
++                "sha256:961d03dc3453ebbc59dbdea9e4e11c5651520a876d0f4db161e8674aae935da9"
++            ],
++            "index": "pypi",
++            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2'",
++            "version": "==2.8.2"
++        },
++        "six": {
++            "hashes": [
++                "sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926",
++                "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"
++            ],
++            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2'",
++            "version": "==1.16.0"
++        }
++    },
++    "develop": {}
++}
+-- 
+2.42.0
+
+
+From de73a8c88fc1610f1473a0a428581f54f343751f Mon Sep 17 00:00:00 2001
+From: Derek Araki-Kurdyla <djak001@bucknell.edu>
+Date: Fri, 5 Jul 2024 15:08:30 -0400
+Subject: [PATCH 2/3] Task 1.1 complete
+
+---
+ client3.py | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/client3.py b/client3.py
+index 3fc09b7..9e82cce 100644
+--- a/client3.py
++++ b/client3.py
+@@ -35,14 +35,16 @@ def getDataPoint(quote):
+     stock = quote['stock']
+     bid_price = float(quote['top_bid']['price'])
+     ask_price = float(quote['top_ask']['price'])
+-    price = bid_price
++    price = (bid_price+ask_price)/2
+     return stock, bid_price, ask_price, price
+ 
+ 
+ def getRatio(price_a, price_b):
+     """ Get ratio of price_a and price_b """
+     """ ------------- Update this function ------------- """
+-    return 1
++    if price_b == 0:
++        return
++    return price_a/price_b
+ 
+ 
+ # Main
+@@ -52,8 +54,10 @@ if __name__ == "__main__":
+         quotes = json.loads(urllib.request.urlopen(QUERY.format(random.random())).read())
+ 
+         """ ----------- Update to get the ratio --------------- """
++        prices = {}
+         for quote in quotes:
+             stock, bid_price, ask_price, price = getDataPoint(quote)
++            prices[stock] = price
+             print("Quoted %s at (bid:%s, ask:%s, price:%s)" % (stock, bid_price, ask_price, price))
+ 
+-        print("Ratio %s" % getRatio(price, price))
++        print("Ratio %s" % getRatio(prices["ABC"], prices["DEF"]))
+-- 
+2.42.0
+
+
+From 6880e7ff3f8277eb77c428ad791d207a2c8eee88 Mon Sep 17 00:00:00 2001
+From: Derek Araki-Kurdyla <djak001@bucknell.edu>
+Date: Fri, 5 Jul 2024 18:18:45 -0400
+Subject: [PATCH 3/3] unit tests
+
+---
+ __pycache__/client3.cpython-311.pyc | Bin 0 -> 1949 bytes
+ client_test.py                      |  18 ++++++++++++++++++
+ 2 files changed, 18 insertions(+)
+ create mode 100644 __pycache__/client3.cpython-311.pyc
+
+diff --git a/__pycache__/client3.cpython-311.pyc b/__pycache__/client3.cpython-311.pyc
+new file mode 100644
+index 0000000000000000000000000000000000000000..ccbd2e925a7d107f41779fcd978263d3b75a856d
+GIT binary patch
+literal 1949
+zcmaJ>O=ufO6rR!kXk|&Z<=9Rgt7YBdHcBJQPDtY#C&97gl0u9fHz8iqh_z<ytSxDk
+z-Bp8C8ARzpfk0IVM9>s`C~itFp_Il)7jo)J3ZfAU1w&7{3DQ$eeY3JGJJ9URynS!x
+z%{T9F=4ZdZ1HpGbT3r6lgU~-rXnp=Y=G9*qp$CW{f|E#T{;`4`*`;vArSODP1j2ud
+z6p;u(-Bcptnv3l>{&XSgfzd&QEx>sUqxl_{qUg(~iWl_Is;{L%xz&~pXtT35d+<;B
+z&8~xTiw7LM+CB-UAGem!;d2j5o89|r2bit5>{kLFq#>n;2Ec=eas*Bm>5;>zH+Y1U
+zUZqdzSB}!7w1@Ui0wQR>L)^6Y2TUZ|2h>CRfp*ZNK)pYD4r5?+Z`9f01L~$d#6Pfa
+zAxNEVX$#{1*oi$;$cg9;j{)g-f)^m03n<j}k}1vRhHhC_W+D<v>IpS@OE;~F@zL?o
+z$n7jO)-Pz}+}9i0zYx#FeoSE(c!f9^uO0$<fIKJ<m~A^YuysHi)?Dp1!nOIser~wl
+z*u}Rs-?EF#yYgHP>>xtUi_iw2$809gFZ1A~m^&-a89K=(sH`TFvUQ8fX-Wwt@>gmy
+zOHJ9*<rSKyhH8O^OjJwF=vvy6ZNaqk#G384^h|t7Besw+v;=L+s=4-(1v-RnVL7R*
+zR!Fdg+gaVB28)gDferDdz6W%htN{r@rT|1{-|M-^Rg)TKgiwR7sfN0yh1aqMSx>5w
+zsGi8CXxcI(*A}LALL;BgU5+g4hPpz-tC>_HY~G<^3y{NOkwj7h&C?^9b=$W>ttfaf
+z$2>6Dy^-0G3XlTY<tOXDK<T4<vxV5--F+omzEtb~aPv;BKT_=;t#ywUF8$AR-QQnY
+zulnW9p{nnLLagrXE``dAkA#XhT;ap7039Xv%MJv_JLT~nFiv@3g7+Q;7jZ2>x#TfR
+z79@zvy)S=8Eg9mk>9W2oJ5h_PvYIA){E}=i#Mxg^$Ys0t)?3Vy$<}1qVDE)3K>)5W
+zB%>F^6EMtofi#_Wcb0~}$rti<sk127y*;I~cP~`<V+MOiY$+a3saiT7&$;JW9*Lau
+z$f_kDhfGf7#FH`vdm<;DY}z#O8i#U{bCNu4+T7H|X`742W<motziR4fTQtCaJ!N-h
+zjbu_=8ZjtbDATgVrfduIS7TQeZ9MB_$+4E1kXBPP9=CZ73dt4#V};r{ZVOOi#I)Tl
+z6gQyg84AZhO{7%I<_)S6TXZVWv_&UIrokR~rydQ6H8R-i>eQf9%1|HyHo?4ig7;dQ
+zOu<D-((}g0Fvo7NnFiY6Fvg7&2>S|N*6PS#a9SPpRa(6vBG1W!06#%0;D+eNBMr1q
+zdIdb#K>MTz@xEg2IX6(@26p{{;uodi(r_7nfBgROyEpIMY@iNd8aHVX*8_v4-uuVO
+zGY@B91W!E=o_ccT>Ey4IJN_N<ng5TjXI<6PbG6fR)!=+BIR7Ge?RoH8HF&)iyj~3~
+z)&h$~aaWqI2aZ6-`@jayLjal4Vyr%P?n!W)R>z{Xv1rvdQjC>8Eo+bZ>cOGnOzF(s
+z%Wz$av0`jH%i4~{T4i3@>o?R&v-d1jeTkYcQE~dN<Sz=v)$(|Gd~@c}nV&8{`DA<e
+jw{z9OsoLOFwR5T}U93qLD^70=ApRJ{pux8tcJlEbSZw7I
+
+literal 0
+HcmV?d00001
+
+diff --git a/client_test.py b/client_test.py
+index af2bf26..dd5cddb 100644
+--- a/client_test.py
++++ b/client_test.py
+@@ -1,5 +1,6 @@
+ import unittest
+ from client3 import getDataPoint
++from client3 import getRatio
+ 
+ class ClientTest(unittest.TestCase):
+   def test_getDataPoint_calculatePrice(self):
+@@ -8,6 +9,15 @@ class ClientTest(unittest.TestCase):
+       {'top_ask': {'price': 121.68, 'size': 4}, 'timestamp': '2019-02-11 22:06:30.572453', 'top_bid': {'price': 117.87, 'size': 81}, 'id': '0.109974697771', 'stock': 'DEF'}
+     ]
+     """ ------------ Add the assertion below ------------ """
++    # returns stock, bid_price, ask_price, price
++    # stock = quote['stock']
++    # bid_price = float(quote['top_bid']['price'])
++    # ask_price = float(quote['top_ask']['price'])
++    # price = (bid_price+ask_price)/2
++    for quote in quotes:
++      bid_price = float(quote['top_bid']['price'])
++      ask_price = float(quote['top_ask']['price'])
++      self.assertEqual(getDataPoint(quote), (quote['stock'], bid_price, ask_price, (bid_price+ask_price)/2))
+ 
+   def test_getDataPoint_calculatePriceBidGreaterThanAsk(self):
+     quotes = [
+@@ -15,10 +25,18 @@ class ClientTest(unittest.TestCase):
+       {'top_ask': {'price': 121.68, 'size': 4}, 'timestamp': '2019-02-11 22:06:30.572453', 'top_bid': {'price': 117.87, 'size': 81}, 'id': '0.109974697771', 'stock': 'DEF'}
+     ]
+     """ ------------ Add the assertion below ------------ """
++    for quote in quotes:
++      bid_price = float(quote['top_bid']['price'])
++      ask_price = float(quote['top_ask']['price'])
++      self.assertEqual(getDataPoint(quote), (quote['stock'], bid_price, ask_price, (bid_price+ask_price)/2))
+ 
+ 
+   """ ------------ Add more unit tests ------------ """
+ 
++  def test_getRatio(self):
++    not_matter = 100
++    self.assertEqual(getRatio(0, not_matter), 0)
++    self.assertEqual(getRatio(not_matter, 0), None)    
+ 
+ 
+ if __name__ == '__main__':
+-- 
+2.42.0
+
